@@ -7,4 +7,5 @@ target 'Whisper' do
 
   # Pods for Whisper
 	pod 'Firebase'
+    pod 'Firebase/Database'
 end

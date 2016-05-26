@@ -7,15 +7,28 @@
 //
 
 import UIKit
+import Firebase
 
 class MasterViewController: UITableViewController {
 
     var detailViewController: DetailViewController? = nil
-    var objects = [AnyObject]()
+    var objects = [String]()
+    var ref : FIRDatabaseReference? = nil
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        //create a new object with an empty dictionary
+        self.ref = FIRDatabase.database().reference()
+        self.ref!.child("users").child("allenObject").setValue(["username": "allenDictionary"])
+        //create a dictionaery every time the database changes - dictionary will be all of the changes that occured
+       _ = self.ref!.child("users/allenObject/allenDictionary").observeEventType(FIRDataEventType.Value, withBlock: { (snapshot) in
+        if let postDict = snapshot.value as? [String : String]{
+        self.objects = Array<String>(postDict.values)
+            self.tableView.reloadData()}
+        
+        })
+
         // Do any additional setup after loading the view, typically from a nib.
         self.navigationItem.leftBarButtonItem = self.editButtonItem()
 
@@ -38,7 +51,24 @@ class MasterViewController: UITableViewController {
     }
 
     func insertNewObject(sender: AnyObject) {
-        objects.insert(NSDate(), atIndex: 0)
+        let rangeOfInts = [Int](65...91)
+        var rangeOfChars:Array<Character> = rangeOfInts.map{ value in
+            
+            return Character(UnicodeScalar(value))
+        }
+        var uniqueString = ""
+
+        for _ in 1...6{
+         let random = arc4random_uniform(UInt32(rangeOfChars.count))
+            uniqueString.append(rangeOfChars[Int(random)])
+        }
+        
+        objects.insert(uniqueString, atIndex: 0)
+        
+        let newUniqueWordList = self.ref!.child("users/allenObject/allenDictionary").childByAutoId()
+        newUniqueWordList.setValue(uniqueString)
+        
+        
         let indexPath = NSIndexPath(forRow: 0, inSection: 0)
         self.tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
     }
@@ -48,7 +78,7 @@ class MasterViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
-                let object = objects[indexPath.row] as! NSDate
+                let object = objects[indexPath.row]
                 let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
                 controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem()
@@ -70,8 +100,8 @@ class MasterViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
 
-        let object = objects[indexPath.row] as! NSDate
-        cell.textLabel!.text = object.description
+        let object = objects[indexPath.row]
+        cell.textLabel!.text = object
         return cell
     }
 

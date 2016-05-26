@@ -35,6 +35,6 @@
 	<key>GOOGLE_APP_ID</key>
 	<string>1:82047668018:ios:f922b8ffd40e4a28</string>
 	<key>DATABASE_URL</key>
-	<string>https://spicerwhisper-59eee.firebaseio.com</string>
+	<string>https://spicerwhisper.firebaseio.com/</string>
 </dict>
 </plist>
