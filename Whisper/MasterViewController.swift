@@ -16,6 +16,8 @@ class MasterViewController: UITableViewController {
     var ref : FIRDatabaseReference? = nil
 
 
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
         //create a new object with an empty dictionary
